@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>스미싱 예방 앱</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../static/style.css">
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="header_text">SiJoeNa</h1>
+    </header>
+    <main>
+      <div class="container">
+        <p class="qtext">의심되는 문자를 입력해주세요!</p>
+        <textarea id="message" class="messagebox" rows="5"></textarea>
+        <button class="analyzebtn" onclick="analyzeMessage()">분석하기</button>
+        <div class="result" id="result"></div>
+        <div class="advice" id="advice" class="fade-in"></div>
+        <p class="accuracy">모델 정확도: {{ accuracy * 100 }}%</p>
+      </div>
+    </main>
+
+    <div class="bottom-navbar">
+      <a href="#" class="nav-item">
+        <i class="bi bi-house-door icons"></i>
+        <span>홈</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="bi bi-exclamation-triangle icons"></i>
+        <span>신고</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="bi bi-headset icons"></i>
+        <span>고객센터</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="bi bi-three-dots icons"></i>
+        <span>사용법</span>
+      </a>
+    </div>
+
+    <script>
+      function analyzeMessage() {
+        const message = document.getElementById("message").value;
+
+        // Fetch API를 사용하여 Flask 서버에 POST 요청
+        fetch("/analyze", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: message }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const resultDiv = document.getElementById("result");
+            const adviceDiv = document.getElementById("advice");
+
+            // 애니메이션 클래스 제거 후 다시 추가하여 시각적 효과 제공
+            resultDiv.classList.remove("fade-in");
+            void resultDiv.offsetWidth;  // 트리거를 위한 DOM 리플로우
+            resultDiv.classList.add("fade-in");
+
+            adviceDiv.classList.remove("fade-in");
+            void adviceDiv.offsetWidth;
+            adviceDiv.classList.add("fade-in");
+
+            if (data.is_spam) {
+              resultDiv.style.color = "red";
+              let adviceHtml = `<p>${data.advice.description}</p><ul>`;
+              data.advice.steps.forEach((step) => {
+                adviceHtml += `<li>${step}</li>`;
+              });
+              adviceHtml += "</ul>";
+              resultDiv.innerHTML = " ";
+              adviceDiv.innerHTML = adviceHtml;
+              adviceDiv.style.display = "block";
+            } else {
+              resultDiv.innerHTML = "이 메시지는 안전합니다.";
+              resultDiv.style.color = "green";
+              adviceDiv.style.display = "none";
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>
