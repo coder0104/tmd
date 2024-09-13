@@ -1,0 +1,67 @@
+body {
+  font-family: Presenter, sans-serif;
+  margin: 0;
+  padding-bottom: 100px; /* Navbar 높이만큼 패딩 추가 */
+}
+
+.header {
+  background-color: #2d720d; /* 초록색 */
+  padding-top: 3rem;
+}
+.header_text {
+  color: white;
+  text-align: right;
+  padding-right: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.howtouse{
+  margin-left: 1rem;
+  font-size: 1.8rem;
+}
+
+.container{
+  margin-top: 1rem!important;
+  width: 80%;
+  padding: 15px;
+  margin: 0 auto;
+  background-color: #f7f7f7;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(120, 120, 120, 0.1); /* 그림자 효과로 공중에 떠 있는 느낌 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 부드러운 변환 효과 */
+}
+
+.main{
+  font-size: 1.8rem;
+}
+
+.sub{
+  font-size: 1.2rem;
+}
+
+.bottom-navbar {
+  display: flex;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #d9d9d9;
+  padding: 9px 0;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+.nav-item:hover {
+  color: #457024;
+}
+
+.icons {
+  font-size: 1.8rem;
+  font-weight: bold;
+}

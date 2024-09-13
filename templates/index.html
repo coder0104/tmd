@@ -21,21 +21,20 @@
         <p class="accuracy">모델 정확도: {{ accuracy * 100 }}%</p>
       </div>
     </main>
-
     <div class="bottom-navbar">
-      <a href="#" class="nav-item">
+      <a href="{{url_for('index')}}" class="nav-item">
         <i class="bi bi-house-door icons"></i>
         <span>홈</span>
       </a>
-      <a href="#" class="nav-item">
+      <a href="{{url_for('declation')}}" class="nav-item">
         <i class="bi bi-exclamation-triangle icons"></i>
         <span>신고</span>
       </a>
-      <a href="#" class="nav-item">
+      <a href="{{url_for('customer')}}" class="nav-item">
         <i class="bi bi-headset icons"></i>
         <span>고객센터</span>
       </a>
-      <a href="#" class="nav-item">
+      <a href="{{url_for('usuage')}}" class="nav-item">
         <i class="bi bi-three-dots icons"></i>
         <span>사용법</span>
       </a>
@@ -49,6 +48,7 @@
         fetch("/analyze", {
           method: "POST",
           headers: {
+
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ message: message }),

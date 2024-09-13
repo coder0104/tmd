@@ -77,6 +77,18 @@ def analyze_message(message):
 def index():
     return render_template('index.html', accuracy=accuracy)
 
+@app.route('/declation')
+def declation():
+    return render_template('declation.html', accuracy=accuracy)
+
+@app.route('/usuage')
+def usuage():
+    return render_template('usuage.html', accuracy=accuracy)
+
+@app.route('/customer')
+def customer():
+    return render_template('customer.html', accuracy=accuracy)
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     content = request.json
@@ -113,4 +125,4 @@ def analyze():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

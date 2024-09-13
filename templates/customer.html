@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>customer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="../static/customer.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="header_text">SiJoeNa</h1>
+  </header>
+  <main>
+    <div class="container">
+      <p class="qtext_1">피싱인 문자를 신고하여 주세요!<br>저희 인공지능 발전에 큰 도움이 됩니다!</p>
+      <textarea id="message" class="messagebox" rows="5"></textarea>
+      <button class="analyzebtn" onclick="analyzeMessage()">등록하기</button>
+      <div class="result" id="result"></div>
+    </div>
+  </main>
+  <div class="bottom-navbar">
+    <a href="{{url_for('index')}}" class="nav-item">
+      <i class="bi bi-house-door icons"></i>
+      <span>홈</span>
+    </a>
+    <a href="{{url_for('declation')}}" class="nav-item">
+      <i class="bi bi-exclamation-triangle icons"></i>
+      <span>신고</span>
+    </a>
+    <a href="{{url_for('customer')}}" class="nav-item">
+      <i class="bi bi-headset icons"></i>
+      <span>고객센터</span>
+    </a>
+    <a href="{{url_for('usuage')}}" class="nav-item">
+      <i class="bi bi-three-dots icons"></i>
+      <span>사용법</span>
+    </a>
+  </div>
+
+
+  <script>
+    function analyzeMessage() {
+      const message = document.getElementById("message").value;
+
+      const resultDiv = document.getElementById("result");
+
+      resultDiv.classList.remove("fade-in");
+      void resultDiv.offsetWidth; 
+      resultDiv.classList.add("fade-in");
+
+      resultDiv.classList.remove("fade-in");
+      void resultDiv.offsetWidth;
+      resultDiv.classList.add("fade-in");
+
+      resultDiv.innerHTML = "등록이 완료되었습니다!";
+      resultDiv.style.color = "navy";
+      
+
+
+      
+    }
+  </script>
+</body>
+</html>
