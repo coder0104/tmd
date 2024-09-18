@@ -9,6 +9,10 @@ from konlpy.tag import Okt
 # 형태소 분석기 설정
 okt = Okt()
 
+# 텍스트 전처리 함수 (형태소 분석 후 리스트를 문자열로 결합)
+def tokenize_korean(text):
+    return ' '.join(okt.morphs(text))
+
 # 한국어 데이터셋 예시
 data = {
     'message': [
@@ -36,19 +40,16 @@ data = {
     'label': [1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0]  # 1은 스팸, 0은 정상
 }
 
+# DataFrame으로 변환
 df = pd.DataFrame(data)
-
-# 텍스트 전처리 함수
-def tokenize_korean(text):
-    return okt.morphs(text)
 
 # 학습 데이터와 테스트 데이터 분리
 X_train, X_test, y_train, y_test = train_test_split(df['message'], df['label'], test_size=0.2, random_state=42)
 
-# 벡터화
-vectorizer = TfidfVectorizer(tokenizer=tokenize_korean)
-X_train_vect = vectorizer.fit_transform(X_train)
-X_test_vect = vectorizer.transform(X_test)
+# 벡터화 (형태소 분석 후 리스트를 문자열로 변환하여 전달)
+vectorizer = TfidfVectorizer()
+X_train_vect = vectorizer.fit_transform([tokenize_korean(text) for text in X_train])
+X_test_vect = vectorizer.transform([tokenize_korean(text) for text in X_test])
 
 # 모델 학습
 model = MultinomialNB()

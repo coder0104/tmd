@@ -14,24 +14,24 @@ cred = credentials.Certificate("path/to/serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# 형태소 분석기 설정
+# Okt 형태소 분석기
 okt = Okt()
 
-# 문자 메시지 전처리 함수 (train_model.py와 동일하게 정의)
+# 텍스트 전처리 함수 (Flask 앱에서 모델을 불러오기 전에 정의)
 def tokenize_korean(text):
-    return okt.morphs(text)
+    return ' '.join(okt.morphs(text))  # 형태소 분석 후 리스트를 문자열로 결합
 
-# 인공지능 모델 및 벡터화기 로드
+# 모델 및 벡터화기 로드 (tokenize_korean 함수가 정의된 후 불러옴)
 model = joblib.load('sms_spam_model.pkl')
 vectorizer = joblib.load('vectorizer.pkl')
 
-# 모델 정확도 로드
+# 정확도 로드
 accuracy = 0.0
 if os.path.exists('model_accuracy.txt'):
     with open('model_accuracy.txt', 'r') as f:
         accuracy = float(f.read())
 
-# API에서 스미싱 링크 목록 가져오기
+# 스미싱 링크 데이터 가져오기
 def get_smishing_links():
     url = "https://api.odcloud.kr/api/15109780/v1/uddi:707478dd-938f-4155-badb-fae6202ee7ed?page=1&perPage=1986"
     service_key = "9IZyKdl19TjST2Cjq0YYi8XwbV%2BGTCOD3DE2XdT%2BTGHY9akOskrVLU28bT8AlUpk8%2B%2BHg2zE5PP3BntcMsiM6Q%3D%3D"
@@ -44,35 +44,33 @@ def get_smishing_links():
         return links
     return []
 
-# 정규 표현식을 사용한 URL 추출 함수
+# URL 추출 함수
 def extract_urls(text):
-    # 일반적인 URL 패턴을 인식하는 정규 표현식
     url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
     return url_pattern.findall(text)
 
-# 링크 정규화 함수
+# URL 정규화 함수
 def normalize_url(url):
-    # https, http, www 제거
     return re.sub(r'^https?://(www\.)?', '', url).strip().strip('/')
 
-# 문자 메시지 분석 함수
+# 메시지 분석 함수
 def analyze_message(message):
-    # API를 통해 스미싱 링크 목록을 가져옴
     smishing_links = get_smishing_links()
     normalized_smishing_links = [normalize_url(link) for link in smishing_links]
     
-    # 메시지에서 URL 추출
     urls = extract_urls(message)
     for url in urls:
         normalized_url = normalize_url(url)
         if any(normalized_url in link for link in normalized_smishing_links):
-            return 1  # 스미싱으로 판정
+            return 1  # 스미싱으로 판단
 
     # 인공지능 모델을 사용한 스미싱 분석
-    features = vectorizer.transform([message])
+    processed_message = tokenize_korean(message)  # 메시지를 형태소 분석 후 벡터화
+    features = vectorizer.transform([processed_message])
     prediction = model.predict(features)
     return prediction[0]
 
+# 기본 페이지 라우팅
 @app.route('/')
 def index():
     return render_template('index.html', accuracy=accuracy)
@@ -89,6 +87,7 @@ def usuage():
 def customer():
     return render_template('customer.html', accuracy=accuracy)
 
+# 메시지 분석 API
 @app.route('/analyze', methods=['POST'])
 def analyze():
     content = request.json
@@ -96,14 +95,12 @@ def analyze():
 
     is_spam = analyze_message(message)
 
-    # Firestore에 결과 저장
     data = {
         'message': message,
         'is_spam': bool(is_spam)
     }
     db.collection('sms_analysis').add(data)
 
-    # 피싱 문자 대처법 안내
     response = {
         'is_spam': bool(is_spam)
     }
@@ -125,4 +122,4 @@ def analyze():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
